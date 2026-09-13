@@ -33,3 +33,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+prueba_error_de_sintaxis = [
