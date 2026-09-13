@@ -1,0 +1,25 @@
+name: Security and Code Quality in 01-security-compliance
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  security-audit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python Environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Ruff Static Analyzer
+        run: pip install ruff
+
+      - name: Execute Security & Code Analysis
+        run: ruff check --select S,E,F,W,I --output-format=github .
