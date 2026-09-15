@@ -26,3 +26,14 @@ jobs:
 
       - name: Execute Security & Code Analysis
         run: ruff check --select S,E,F,W,I --output-format=github .
+        
+  shell-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Run ShellCheck on Bash Scripts
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: './01-security-compliance' 
