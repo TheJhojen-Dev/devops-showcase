@@ -1,4 +1,4 @@
-# 🛡️ SysGuard CLI
+# SysGuard CLI
 
 **Security auditing and hardening for Linux servers, straight from your terminal.**
 
@@ -12,6 +12,10 @@
 ![Platform](https://img.shields.io/badge/Platform-Linux-lightgrey?logo=linux)
 ![CI](https://img.shields.io/badge/CI-ruff%20%2B%20shellcheck-success?logo=githubactions&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green)
+
+<p align="center">
+  <img src="resources/demo.gif" alt="SysGuard CLI Demo" width="800">
+</p>
 
 ---
 
