@@ -11,9 +11,10 @@ _sysguard_opts() {
 
     # Solo sugerir flags si el usuario ya escribió un guion
     if [[ ${cur} == -* ]]; then
-        COMPREPLY=( $(compgen -W \
+        # Solución limpia para corregir el error SC2207
+        mapfile -t COMPREPLY < <(compgen -W \
             "--check-firewall --analyze-logs --metrics-use --help" \
-            -- "${cur}") )
+            -- "${cur}")
     fi
 }
 
