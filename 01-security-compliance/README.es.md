@@ -13,6 +13,10 @@
 ![CI](https://img.shields.io/badge/CI-ruff%20%2B%20shellcheck-success?logo=githubactions&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
+<p align="center">
+  <img src="resources/demo.gif" alt="Demo del CLI SysGuard en acción" width="800">
+</p>
+
 ---
 
 ## El problema que resuelve
