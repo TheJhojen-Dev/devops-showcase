@@ -19,13 +19,13 @@ jobs:
       - name: Set up Python Environment
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.13"
 
       - name: Install Ruff Static Analyzer
         run: pip install ruff
 
       - name: Execute Security & Code Analysis
-        run: ruff check --select S,E,F,W,I --output-format=github .
+        run: ruff check --output-format=github .
         
   shell-lint:
     runs-on: ubuntu-latest

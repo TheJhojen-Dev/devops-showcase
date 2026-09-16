@@ -1,18 +1,19 @@
+"""SysGuard CLI - Auditoría y Hardening para servidores Linux."""
+
 import argparse
 import os
-import shutil
 import subprocess
 import sys
 
-# 1. Ajustar sys.path ANTES de importar paquetes internos
+# Garantiza que Python encuentre resources/ sin importar el cwd
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
-from resources.banner import (
-    show_banner,
+from resources.banner import (  # noqa: E402
     enter_alt_screen,
     exit_alt_screen,
+    show_banner,
 )
 
 try:
@@ -20,9 +21,11 @@ try:
     from prompt_toolkit.completion import WordCompleter
 except ImportError:
     prompt = None
+    WordCompleter = None
 
 
 def check_root():
+    """Verifica que el script se ejecute con privilegios de root."""
     if os.geteuid() != 0:
         msg = (
             "[!] Error: Este script requiere privilegios de administrador. "
@@ -33,35 +36,40 @@ def check_root():
 
 
 def audit_firewall():
+    """Audita el estado del cortafuegos UFW."""
     print("[*] Iniciando auditoría del cortafuegos...")
-    ufw_path = shutil.which("ufw")
-    if not ufw_path:
-        print("[!] Error: 'ufw' no está instalado en este sistema.")
-        return
-
+    ufw_path = "/usr/sbin/ufw"
+    if not os.path.exists(ufw_path):
+        ufw_path = "ufw"
     try:
         result = subprocess.run(
-            [ufw_path, "status"], capture_output=True, text=True, check=True
+            [ufw_path, "status"],
+            capture_output=True,
+            text=True,
+            check=True,
         )
         print(result.stdout)
+    except FileNotFoundError:
+        print("[!] Error: 'ufw' no está instalado en este sistema.")
     except subprocess.CalledProcessError as e:
         print(f"[!] Error al ejecutar ufw: {e.stderr}")
 
 
 def get_init_system():
+    """Detecta el sistema de init activo (runit, systemd, unknown)."""
     if os.path.exists("/run/runit") or os.path.exists("/etc/runit"):
         return "runit"
     try:
-        if os.path.exists("/proc/1/comm"):
-            with open("/proc/1/comm", "r") as f:
-                if "systemd" in f.read():
-                    return "systemd"
+        with open("/proc/1/comm", "r") as f:
+            if "systemd" in f.read():
+                return "systemd"
     except Exception as e:
         print(f"[-] No se pudo determinar init vía /proc/1/comm: {e}")
     return "unknown"
 
 
 def analyze_ssh_logs():
+    """Analiza intentos fallidos de autenticación SSH."""
     init_system = get_init_system()
     print(f"[*] Sistema de init detectado: {init_system.upper()}")
     print("[*] Analizando intentos fallidos de autenticación SSH...")
@@ -74,7 +82,8 @@ def analyze_ssh_logs():
                 failed_attempts = [
                     line.strip()
                     for line in f
-                    if "Failed password" in line or "bad password" in line
+                    if "Failed password" in line
+                    or "bad password" in line
                 ]
         except Exception as e:
             print(f"[!] Error al leer /var/log/auth.log: {e}")
@@ -97,56 +106,71 @@ def analyze_ssh_logs():
                         ]
                     break
                 except Exception as err:
-                    print(f"[-] Saltando ruta de log ilegible {path}: {err}")
+                    print(
+                        f"[-] Saltando ruta de log ilegible {path}: {err}"
+                    )
                     continue
 
     elif init_system == "systemd":
-        jctl_path = shutil.which("journalctl") or "/usr/bin/journalctl"
+        jctl_path = "/usr/bin/journalctl"
         try:
             result = subprocess.run(
-                [jctl_path, "_SYSTEMD_UNIT=ssh.service", "--no-pager", "-n", "50"],
+                [
+                    jctl_path,
+                    "_SYSTEMD_UNIT=ssh.service",
+                    "--no-pager",
+                    "-n",
+                    "50",
+                ],
                 capture_output=True,
                 text=True,
                 check=True,
             )
             failed_attempts = [
-                line for line in result.stdout.splitlines() if "Failed" in line
+                line
+                for line in result.stdout.splitlines()
+                if "Failed" in line
             ]
         except Exception as e:
             print(f"[!] Error al acceder a journalctl: {e}")
             return
 
     if failed_attempts:
-        msg = f"[!] Alerta: Se detectaron {len(failed_attempts)} intentos fallidos:"
-        print(msg)
+        count = len(failed_attempts)
+        print(f"[!] Alerta: Se detectaron {count} intentos fallidos:")
         for attempt in failed_attempts[-5:]:
             print(f"  -> {attempt}")
     else:
-        print("[+] No se detectaron anomalías de inicio de sesión recientes.")
+        print(
+            "[+] No se detectaron anomalías de inicio de sesión recientes."
+        )
 
 
 def analyze_performance_use():
+    """Diagnóstico de rendimiento bajo la metodología USE."""
     print("[*] Ejecutando diagnóstico de rendimiento (Metodología USE)...")
     print("-" * 60)
 
     # 1. UTILIZACIÓN (Uso de disco y memoria)
     print("[U] UTILIZACIÓN:")
     try:
-        df = subprocess.run(["df", "-h", "/"], capture_output=True, text=True, check=True)
+        df = subprocess.run(
+            ["df", "-h", "/"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
         disk_line = df.stdout.splitlines()[1].split()
-        print(f"  -> Espacio en Disco (/): {disk_line[2]} usado ({disk_line[3]} libre)")
-        
+        print(
+            f"  -> Espacio en Disco (/): "
+            f"{disk_line[2]} usado ({disk_line[3]} libre)"
+        )
         with open("/proc/meminfo", "r") as f:
-            memdata = {}
-            for line in f:
-                parts = line.split(":")
-                if len(parts) == 2:
-                    memdata[parts[0].strip()] = int(parts[1].split()[0])
-            
-            total = memdata.get("MemTotal", 1)
-            available = memdata.get("MemAvailable", memdata.get("MemFree", 0))
-            used_pct = round(((total - available) / total) * 100, 2)
-            print(f"  -> Memoria RAM: {used_pct}% en uso real")
+            lines = f.readlines()
+            total = int(lines[0].split()[1])
+            free = int(lines[1].split()[1])
+            usage = round((total - free) / total * 100, 2)
+            print(f"  -> Memoria RAM: {usage}% en uso")
     except Exception as e:
         print(f"  [!] Fallo al calcular utilización: {e}")
 
@@ -155,7 +179,10 @@ def analyze_performance_use():
     try:
         with open("/proc/loadavg", "r") as f:
             load = f.read().split()
-            print(f"  -> Carga promedio (1 min, 5 min, 15 min): {load[0]}, {load[1]}, {load[2]}")
+            print(
+                f"  -> Carga promedio (1, 5, 15 min): "
+                f"{load[0]}, {load[1]}, {load[2]}"
+            )
             print(f"  -> Cola de procesos activos: {load[3]}")
     except Exception as e:
         print(f"  [!] Fallo al calcular saturación: {e}")
@@ -163,19 +190,29 @@ def analyze_performance_use():
     # 3. ERRORES (Mensajes críticos del Kernel/Hardware)
     print("\n[E] ERRORES (Mensajes de error recientes en dmesg):")
     try:
-        dmesg = subprocess.run(["dmesg", "-l", "err,crit,alert"], capture_output=True, text=True, check=True)
+        dmesg = subprocess.run(
+            ["dmesg", "-l", "err,crit,alert"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
         errors = dmesg.stdout.splitlines()
         if errors:
             for err in errors[-3:]:
                 print(f"  -> {err}")
         else:
-            print("  [+] No se registran errores críticos recientes en el Kernel.")
+            print(
+                "  [+] No se registran errores críticos recientes "
+                "en el Kernel."
+            )
     except Exception as e:
         print(f"  [!] Fallo al consultar dmesg: {e}")
+
     print("-" * 60)
 
 
 def execute_action(action):
+    """Ejecuta la acción seleccionada por el usuario."""
     if action == "check-firewall":
         audit_firewall()
     elif action == "analyze-logs":
@@ -188,9 +225,12 @@ def execute_action(action):
 
 
 def run_interactive_menu():
+    """Menú interactivo con autocompletado y pantalla alterna."""
     if not prompt:
-        print("[!] Error: 'prompt_toolkit' no está instalado. "
-              "Ejecuta 'pip install -r requirements.txt'")
+        print(
+            "[!] Error: 'prompt_toolkit' no está instalado. "
+            "Ejecuta 'pip install -r requirements.txt'"
+        )
         sys.exit(1)
 
     enter_alt_screen()
@@ -222,6 +262,7 @@ def run_interactive_menu():
 
 
 def main():
+    """Punto de entrada principal."""
     check_root()
 
     desc = "SysGuard CLI - Herramienta de Auditoría y Hardening"

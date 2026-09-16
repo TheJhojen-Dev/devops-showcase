@@ -38,7 +38,7 @@ def show_banner(init_system: str = "desconocido") -> None:
     print(BANNER)
     _spinner("Detectando sistema de init...", duration=0.8)
     print(f"  ✓ Init detectado: {init_system.upper()}")
-    print(f"  ✓ Permisos: ROOT")
+    print("  ✓ Permisos: ROOT")
     print()
 
 # --- Alternate Screen Buffer  ---

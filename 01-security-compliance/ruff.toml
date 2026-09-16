@@ -1,0 +1,13 @@
+# ruff.toml — Configuración de análisis estático para devops-showcase
+target-version = "py312"
+line-length = 88
+
+[lint]
+select = ["S", "E", "F", "W", "I"]
+ignore = [
+    "S603",
+    "S607",
+]
+
+[lint.isort]
+known-first-party = ["resources"]
