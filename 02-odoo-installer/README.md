@@ -1,10 +1,7 @@
 # odooctl
 
-<<<<<<< HEAD
-=======
 ![odooctl Demo](demo.png)
 
->>>>>>> main
 **Automated, secure installation and deployment of Odoo Community on Linux servers.**
 
 > An interactive installer that turns a multi-step ERP deployment — system
@@ -72,15 +69,6 @@ job, built with the Unix philosophy: **do one thing and do it well.**
 
 ## Demo
 
-<<<<<<< HEAD
-```
-  ██▒
-  ██████▒   ██████▒  ██████▒   ██████▒  █████▒ ████████▒ ██╗
-  ██▒   ██▒ ██▒  ██▒ ██▒   ██▒ ██▒   ██▒ ██▒     ╚═██╔═╝  ██║
-  ██▒   ██▒ ██▒  ██▒ ██▒   ██▒ ██▒   ██▒ ██▒       ██║    ██║
-  ██████▒   █████▒   ██████▒   ██████▒  █████▒    ██║    █████▒
-  ╚═════╝   ╚════╝   ╚═════╝   ╚═════╝  ╚════╝    ╚═╝    ╚════╝
-=======
 ```                                                                                         
                  ██▒                                                                     
    ██████▒   ██████▒  ██████▒   ██████▒  █████▒ ████████▒ ██╗           
@@ -89,7 +77,6 @@ job, built with the Unix philosophy: **do one thing and do it well.**
    ██████▒   █████▒   ██████▒   ██████▒  █████▒    ██║    █████▒        
    ╚═════╝   ╚════╝   ╚═════╝   ╚═════╝  ╚════╝    ╚═╝    ╚════╝
                                                                       
->>>>>>> main
 
 1) Instalación Completa (Paso 1 al 4)
 2) Paso 1: Actualizar Sistema y Repositorios

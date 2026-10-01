@@ -1,10 +1,15 @@
 # odooctl
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 ![odooctl Demo](demo.png)
 
 >>>>>>> main
+=======
+![odooctl Demo](demo.png)
+
+>>>>>>> a337300 (docs: actualiza readmes en odoo-installer)
 **Instalación y despliegue automatizado y seguro de Odoo Community en servidores Linux.**
 
 > Un instalador interactivo que convierte un despliegue ERP de múltiples pasos —
@@ -75,6 +80,7 @@ hazla bien.**
 
 ```
 <<<<<<< HEAD
+<<<<<<< HEAD
   ██▒
   ██████▒   ██████▒  ██████▒   ██████▒  █████▒ ████████▒ ██╗
   ██▒   ██▒ ██▒  ██▒ ██▒   ██▒ ██▒   ██▒ ██▒     ╚═██╔═╝  ██║
@@ -82,13 +88,18 @@ hazla bien.**
   ██████▒   █████▒   ██████▒   ██████▒  █████▒    ██║    █████▒
   ╚═════╝   ╚════╝   ╚═════╝   ╚═════╝  ╚════╝    ╚═╝    ╚════╝
 =======
+=======
+>>>>>>> a337300 (docs: actualiza readmes en odoo-installer)
                  ██▒                                                                     
    ██████▒   ██████▒  ██████▒   ██████▒  █████▒ ████████▒ ██╗           
   ██▒   ██▒ ██▒  ██▒ ██▒   ██▒ ██▒   ██▒ ██▒     ╚═██╔═╝  ██║           
   ██▒   ██▒ ██▒  ██▒ ██▒   ██▒ ██▒   ██▒ ██▒       ██║    ██║           
    ██████▒   █████▒   ██████▒   ██████▒  █████▒    ██║    █████▒        
    ╚═════╝   ╚════╝   ╚═════╝   ╚═════╝  ╚════╝   
+<<<<<<< HEAD
 >>>>>>> main
+=======
+>>>>>>> a337300 (docs: actualiza readmes en odoo-installer)
 
 1) Instalación Completa (Paso 1 al 4)
 2) Paso 1: Actualizar Sistema y Repositorios
