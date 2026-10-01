@@ -1,0 +1,99 @@
+---
+- name: Desinstalar Odoo y revertir infraestructura (odooctl)
+  hosts: odoo_servers
+  become: true
+
+  tasks:
+    - name: Detener stack con docker compose
+      community.docker.docker_compose_v2:
+        project_src: "{{ odoo_deploy_dir }}/docker"
+        state: absent
+        remove_volumes: true
+        remove_orphans: true
+      ignore_errors: true
+
+    - name: Eliminar imágenes del stack
+      community.docker.docker_image:
+        name: "{{ item }}"
+        state: absent
+        force_absent: true
+      loop:
+        - odoo:19.0
+        - nginx:alpine
+        - postgres:16-alpine
+        - certbot/certbot
+      ignore_errors: true
+
+    - name: Limpiar recursos huérfanos de Docker
+      community.docker.docker_prune:
+        containers: true
+        images: true
+        networks: true
+        builder_cache: true
+      ignore_errors: true
+
+    - name: Detener servicios Docker
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        state: stopped
+        enabled: false
+      loop:
+        - docker.service
+        - containerd.service
+      ignore_errors: true
+
+    - name: Desinstalar paquetes Docker
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: absent
+        purge: true
+        autoremove: true
+
+    - name: Eliminar repositorio y llave GPG de Docker
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/apt/sources.list.d/docker.list
+        - /etc/apt/keyrings/docker.gpg
+
+    - name: Eliminar datos residuales de Docker
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /var/lib/docker
+        - /var/lib/containerd
+
+    - name: Desactivar y resetear UFW
+      community.general.ufw:
+        state: reset
+      ignore_errors: true
+
+    - name: Eliminar bloque DOCKER-USER de after.rules
+      ansible.builtin.blockinfile:
+        path: /etc/ufw/after.rules
+        marker: "# ─── {mark} Bloque de seguridad odooctl para Docker ───"
+        state: absent
+      ignore_errors: true
+
+    - name: Eliminar directorio de despliegue
+      ansible.builtin.file:
+        path: "{{ odoo_deploy_dir }}"
+        state: absent
+
+    - name: Eliminar logs de instalación
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /tmp/odooctl_sysprep.log
+        - /tmp/odooctl_security.log
+        - /tmp/odooctl_docker.log
+        - /tmp/odooctl_deploy.log
+        - /tmp/odooctl_uninstall.log

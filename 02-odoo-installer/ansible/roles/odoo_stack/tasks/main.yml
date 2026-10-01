@@ -1,0 +1,74 @@
+---
+- name: Crear directorio de despliegue
+  ansible.builtin.file:
+    path: "{{ odoo_deploy_dir }}/docker/nginx"
+    state: directory
+    mode: "0755"
+
+- name: Crear directorios para Certbot
+  ansible.builtin.file:
+    path: "{{ odoo_deploy_dir }}/docker/certbot/{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - conf
+    - www
+
+- name: Copiar docker-compose.yml
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ odoo_deploy_dir }}/docker/docker-compose.yml"
+    mode: "0644"
+
+- name: Generar archivo .env con credenciales
+  ansible.builtin.template:
+    src: env.j2
+    dest: "{{ odoo_deploy_dir }}/docker/.env"
+    mode: "0600"
+    force: false
+
+- name: Generar configuración de Nginx
+  ansible.builtin.template:
+    src: "{{ odoo_use_ssl | ternary('nginx-ssl.conf.j2', 'nginx-http.conf.j2') }}"
+    dest: "{{ odoo_deploy_dir }}/docker/nginx/default.conf"
+    mode: "0644"
+
+- name: Obtener certificado SSL con Certbot
+  when: odoo_use_ssl | bool
+  block:
+    - name: Verificar si ya existen certificados
+      ansible.builtin.stat:
+        path: "{{ odoo_deploy_dir }}/docker/certbot/conf/live/odoo_server"
+      register: ssl_certs
+
+    - name: Ejecutar Certbot standalone
+      ansible.builtin.command:
+        cmd: >-
+          docker run --rm -p 80:80
+          -v {{ odoo_deploy_dir }}/docker/certbot/conf:/etc/letsencrypt
+          -v {{ odoo_deploy_dir }}/docker/certbot/www:/var/www/certbot
+          certbot/certbot certonly --standalone
+          --cert-name odoo_server
+          -d {{ odoo_domain }}
+          --email {{ odoo_certbot_email }}
+          --agree-tos --no-eff-email
+      when: not ssl_certs.stat.exists
+
+- name: Levantar stack con Docker Compose
+  community.docker.docker_compose_v2:
+    project_src: "{{ odoo_deploy_dir }}/docker"
+    state: present
+    pull: always
+
+- name: Reiniciar Nginx para aplicar configuración
+  ansible.builtin.command:
+    cmd: docker compose restart nginx
+  args:
+    chdir: "{{ odoo_deploy_dir }}/docker"
+  changed_when: true
+
+- name: Mostrar URL de acceso
+  ansible.builtin.debug:
+    msg: >-
+      Stack desplegado.
+      {{ odoo_use_ssl | ternary('Acceso seguro: https://' ~ odoo_domain, 'Acceso local: http://localhost') }}

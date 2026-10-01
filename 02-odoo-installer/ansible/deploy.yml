@@ -1,0 +1,17 @@
+---
+- name: Desplegar Odoo con Docker (odooctl)
+  hosts: odoo_servers
+  become: true
+
+  pre_tasks:
+    - name: Verificar espacio mínimo disponible (3.5 GB)
+      ansible.builtin.assert:
+        that:
+          - ansible_mounts | selectattr('mount', 'equalto', '/') | map(attribute='size_available') | first | int >= 3670016000
+        fail_msg: "No hay espacio suficiente en disco (mínimo 3.5 GB)."
+
+  roles:
+    - system_prep
+    - firewall
+    - docker
+    - odoo_stack

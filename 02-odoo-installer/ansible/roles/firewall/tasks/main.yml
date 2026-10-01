@@ -1,0 +1,62 @@
+---
+- name: Instalar UFW
+  ansible.builtin.apt:
+    name: ufw
+    state: present
+
+- name: Desactivar UFW para configuración limpia
+  community.general.ufw:
+    state: reset
+
+- name: Configurar política por defecto — denegar entrante
+  community.general.ufw:
+    direction: incoming
+    default: deny
+
+- name: Configurar política por defecto — permitir saliente
+  community.general.ufw:
+    direction: outgoing
+    default: allow
+
+- name: Configurar política por defecto — denegar ruteo
+  community.general.ufw:
+    direction: routed
+    default: deny
+
+- name: Permitir SSH con límite anti-fuerza bruta
+  community.general.ufw:
+    rule: limit
+    port: "22"
+    proto: tcp
+    comment: SSH Access
+
+- name: Permitir HTTP para Nginx
+  community.general.ufw:
+    rule: allow
+    port: "80"
+    proto: tcp
+    comment: Nginx HTTP
+
+- name: Permitir HTTPS para Nginx
+  community.general.ufw:
+    rule: allow
+    port: "443"
+    proto: tcp
+    comment: Nginx HTTPS
+
+- name: Agregar bloque DOCKER-USER en after.rules
+  ansible.builtin.blockinfile:
+    path: /etc/ufw/after.rules
+    marker: "# ─── {mark} Bloque de seguridad odooctl para Docker ───"
+    block: |
+      *filter
+      :DOCKER-USER - [0:0]
+      -A DOCKER-USER -j RETURN
+      COMMIT
+    create: false
+  when: ansible_facts['os_family'] == 'Debian'
+  ignore_errors: true
+
+- name: Activar UFW
+  community.general.ufw:
+    state: enabled
