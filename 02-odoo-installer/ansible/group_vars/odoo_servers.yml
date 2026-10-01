@@ -1,0 +1,8 @@
+---
+odoo_deploy_dir: /opt/odoo
+
+odoo_domain: localhost
+odoo_use_ssl: false
+odoo_certbot_email: admin@localhost.local
+
+postgres_password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits length=24') }}"

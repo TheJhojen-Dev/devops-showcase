@@ -1,0 +1,60 @@
+---
+- name: Crear directorio para keyrings
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Descargar llave GPG de Docker
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg
+    dest: /tmp/docker.gpg.armored
+    mode: "0644"
+
+- name: Convertir llave GPG a formato binario
+  ansible.builtin.command:
+    cmd: gpg --dearmor -o /etc/apt/keyrings/docker.gpg /tmp/docker.gpg.armored
+  args:
+    creates: /etc/apt/keyrings/docker.gpg
+
+- name: Establecer permisos de la llave GPG
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/docker.gpg
+    mode: "a+r"
+
+- name: Agregar repositorio oficial de Docker
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb [arch={{ ansible_architecture | regex_replace('x86_64', 'amd64') | regex_replace('aarch64', 'arm64') }}
+      signed-by=/etc/apt/keyrings/docker.gpg]
+      https://download.docker.com/linux/{{ ansible_distribution | lower }}
+      {{ ansible_distribution_release }} stable
+    filename: docker
+    state: present
+    update_cache: true
+
+- name: Instalar Docker Engine y componentes
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+    install_recommends: false
+
+- name: Habilitar e iniciar servicios Docker
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+    daemon_reload: true
+  loop:
+    - docker.service
+    - containerd.service
+
+- name: Limpiar llave GPG temporal
+  ansible.builtin.file:
+    path: /tmp/docker.gpg.armored
+    state: absent

@@ -1,0 +1,26 @@
+---
+- name: Actualizar cache de repositorios
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Actualizar todos los paquetes del sistema
+  ansible.builtin.apt:
+    upgrade: safe
+
+- name: Instalar paquetes base del sistema
+  ansible.builtin.apt:
+    name:
+      - curl
+      - wget
+      - git
+      - htop
+      - ca-certificates
+      - gnupg
+      - lsb-release
+    state: present
+    install_recommends: false
+
+- name: Limpiar cache de apt
+  ansible.builtin.apt:
+    autoclean: true
