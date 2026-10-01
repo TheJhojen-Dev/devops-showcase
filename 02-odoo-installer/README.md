@@ -1,6 +1,6 @@
 # odooctl
 
-![odooctl Demo](demo.png)
+![odooctl Demo](resources/demo.png)
 
 **Automated, secure installation and deployment of Odoo Community on Linux servers.**
 
