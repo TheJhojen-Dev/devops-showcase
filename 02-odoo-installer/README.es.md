@@ -1,5 +1,10 @@
 # odooctl
 
+<<<<<<< HEAD
+=======
+![odooctl Demo](demo.png)
+
+>>>>>>> main
 **Instalación y despliegue automatizado y seguro de Odoo Community en servidores Linux.**
 
 > Un instalador interactivo que convierte un despliegue ERP de múltiples pasos —
@@ -69,12 +74,21 @@ hazla bien.**
 ## Demo
 
 ```
+<<<<<<< HEAD
   ██▒
   ██████▒   ██████▒  ██████▒   ██████▒  █████▒ ████████▒ ██╗
   ██▒   ██▒ ██▒  ██▒ ██▒   ██▒ ██▒   ██▒ ██▒     ╚═██╔═╝  ██║
   ██▒   ██▒ ██▒  ██▒ ██▒   ██▒ ██▒   ██▒ ██▒       ██║    ██║
   ██████▒   █████▒   ██████▒   ██████▒  █████▒    ██║    █████▒
   ╚═════╝   ╚════╝   ╚═════╝   ╚═════╝  ╚════╝    ╚═╝    ╚════╝
+=======
+                 ██▒                                                                     
+   ██████▒   ██████▒  ██████▒   ██████▒  █████▒ ████████▒ ██╗           
+  ██▒   ██▒ ██▒  ██▒ ██▒   ██▒ ██▒   ██▒ ██▒     ╚═██╔═╝  ██║           
+  ██▒   ██▒ ██▒  ██▒ ██▒   ██▒ ██▒   ██▒ ██▒       ██║    ██║           
+   ██████▒   █████▒   ██████▒   ██████▒  █████▒    ██║    █████▒        
+   ╚═════╝   ╚════╝   ╚═════╝   ╚═════╝  ╚════╝   
+>>>>>>> main
 
 1) Instalación Completa (Paso 1 al 4)
 2) Paso 1: Actualizar Sistema y Repositorios
