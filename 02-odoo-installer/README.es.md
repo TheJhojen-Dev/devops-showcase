@@ -1,10 +1,7 @@
 # odooctl
 
-<<<<<<< HEAD
-=======
-![odooctl Demo](demo.png)
+![odooctl Demo](resources/demo.png)
 
->>>>>>> main
 **Instalación y despliegue automatizado y seguro de Odoo Community en servidores Linux.**
 
 > Un instalador interactivo que convierte un despliegue ERP de múltiples pasos —
