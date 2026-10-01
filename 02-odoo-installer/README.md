@@ -1,4 +1,4 @@
-# odooctl
+# odooctl / odoo-installer
 
 ![odooctl Demo](resources/demo.png)
 
