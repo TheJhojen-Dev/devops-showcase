@@ -1,4 +1,4 @@
-# 🚀 DevOps Engineering Showcase: Enterprise Automation & Infrastructure
+# ☁️ DevOps Engineering Showcase: Enterprise Automation & Infrastructure
 
 ![Linux](https://img.shields.io/badge/Linux-antiX%20%2F%20Debian%20%2F%20Ubuntu-FCC624?style=for-the-badge&logo=linux&logoColor=black)
 ![Bash](https://img.shields.io/badge/Bash_Scripting-4EAA25?style=for-the-badge&logo=gnu-bash&logoColor=white)
